@@ -1,10 +1,14 @@
-import WhiteBall from "./assets/images/ball_white.png";
+import { BALL_SIZE } from "./settings";
+import WhiteBallImage from "./assets/images/ball_white.png";
 
 export default class Ball {
   constructor(mainContext, id, from, to) {
     this.mainContext = mainContext;
     this.id = id;
-    this.radius = 40;
+    this.radius = BALL_SIZE;
+
+    this.image = new Image();
+    this.image.src = WhiteBallImage;
 
     // Speed
     this.frames = 750;
@@ -17,14 +21,11 @@ export default class Ball {
   }
 
   update() {
-    let image = new Image();
-    image.src = WhiteBall;
-
     this.posX = this.getX();
     this.posY = this.getY();
 
     this.mainContext.drawImage(
-      image,
+      this.image,
       this.posX,
       this.posY,
       this.radius,
@@ -38,8 +39,8 @@ export default class Ball {
 
   detectCollision(balls) {
     for (let i = 0; i < balls.length; i++) {
-      const dx = parseInt(this.posX) - parseInt(balls[i].posX);
-      const dy = parseInt(this.posY) - parseInt(balls[i].posY);
+      const dx = this.posX - balls[i].posX;
+      const dy = this.posY - balls[i].posY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       // Collision detected
@@ -88,25 +89,18 @@ export default class Ball {
     }
   }
 
-  getEase(t, b, c, d) {
-    return -c * (t /= d) * (t - 2) + b;
+  getEase(currentProgress, position, distance, steps) {
+    return (
+      -distance * (currentProgress /= steps) * (currentProgress - 2) + position
+    );
   }
-
-  // getEase(currentProgress, start, distance, steps, power) {
-  //   currentProgress /= steps / 2;
-  //   if (currentProgress < 1) {
-  //     return (distance / 2) * Math.pow(currentProgress, power) + start;
-  //   }
-  //   currentProgress -= 2;
-  //   return (distance / 2) * (Math.pow(currentProgress, power) + 2) + start;
-  // }
 
   getX() {
     if (!this.to) return this.posX;
     let distance = this.to.x - this.posX;
     let steps = this.frames;
     let currentProgress = this.frame;
-    return this.getEase(currentProgress, this.posX, distance, steps, 5);
+    return this.getEase(currentProgress, this.posX, distance, steps);
   }
 
   getY() {
@@ -114,6 +108,6 @@ export default class Ball {
     let distance = this.to.y - this.posY;
     let steps = this.frames;
     let currentProgress = this.frame;
-    return this.getEase(currentProgress, this.posY, distance, steps, 5);
+    return this.getEase(currentProgress, this.posY, distance, steps);
   }
 }

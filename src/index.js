@@ -1,30 +1,56 @@
 import "./styles.css";
 
+import {
+  BALL_SIZE,
+  CANVAS_HEIGHT,
+  CANVAS_PADDING,
+  CANVAS_WIDTH,
+} from "./settings";
+
 import Ball from "./Ball";
 import Canvas from "./Canvas";
+import Cue from "./Cue";
 
 class Game {
   constructor() {
     this.canvas = new Canvas();
     this.ctx = this.canvas.ctx;
-    this.balls = [];
+    this.objects = [];
 
-    this.balls.push(
-      new Ball(this.ctx, 1, { x: 100, y: 178 }, { x: 800, y: 200 })
+    this.objects.push(new Cue(this.ctx, this.canvas.getPosition()));
+    const whiteBallStartPos = {
+      x: 400,
+      y: (CANVAS_HEIGHT + CANVAS_PADDING * 2) / 2 - BALL_SIZE / 2,
+    };
+
+    const whiteBallEndPos = {
+      x: 900,
+      y: (CANVAS_HEIGHT + CANVAS_PADDING * 2) / 2 - BALL_SIZE / 2,
+    };
+
+    this.objects.push(
+      new Ball(this.ctx, 1, whiteBallStartPos, whiteBallEndPos)
     );
-    this.balls.push(new Ball(this.ctx, 2, { x: 400, y: 200 }, null));
+    this.objects.push(
+      new Ball(this.ctx, 2, { ...whiteBallStartPos, x: 800 }, null)
+    );
 
     this.drawAndUpdate();
   }
 
   drawAndUpdate() {
-    this.ctx.clearRect(0, 0, 900, 500);
+    this.ctx.clearRect(
+      0,
+      0,
+      CANVAS_WIDTH + CANVAS_PADDING * 2,
+      CANVAS_HEIGHT + CANVAS_PADDING * 2
+    );
     this.canvas.drawCanvas();
 
-    for (var i = 0; i < this.balls.length; i++) {
-      this.balls[i].update();
-      this.balls[i].detectCollision(
-        this.balls.filter((ball) => ball !== this.balls[i])
+    for (var i = 0; i < this.objects.length; i++) {
+      this.objects[i].update();
+      this.objects[i].detectCollision(
+        this.objects.filter((ball) => ball !== this.objects[i])
       );
     }
 
