@@ -68,7 +68,10 @@ export default class Ball {
           this.frames = this.frames / 10;
           this.frame = 0;
 
-          this.to = { x: this.posX + 50, y: this.posY - 50 };
+          const newX = Math.cos(angle) * 200;
+          const newY = Math.sin(angle) * 200;
+
+          this.to = { x: this.posX + newX, y: this.posY + newY };
 
           // Move hitter ball
           balls[i].frames = balls[i].frames / 10;
