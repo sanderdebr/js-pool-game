@@ -7,7 +7,7 @@ export default class Ball {
     this.radius = 40;
 
     // Speed
-    this.frames = 150;
+    this.frames = 500;
     this.frame = 0;
 
     this.posX = from.x;
@@ -68,15 +68,21 @@ export default class Ball {
           this.frames = this.frames / 10;
           this.frame = 0;
 
-          const newX = Math.cos(angle) * 200;
-          const newY = Math.sin(angle) * 200;
+          const diffX = this.posX - balls[i].posX;
+          const diffY = balls[i].posY - this.posY;
 
-          this.to = { x: this.posX + newX, y: this.posY + newY };
+          this.to = {
+            x: this.posX + diffX * 5,
+            y: this.posY - diffY * 5,
+          };
 
           // Move hitter ball
           balls[i].frames = balls[i].frames / 10;
           balls[i].frame = 0;
-          balls[i].to = { x: balls[i].posX - 50, y: balls[i].posY + 50 };
+          balls[i].to = {
+            x: balls[i].posX - 20,
+            y: balls[i].posY + 20,
+          };
         }
       }
     }
