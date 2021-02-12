@@ -7,7 +7,7 @@ export default class Ball {
     this.radius = 40;
 
     // Speed
-    this.frames = 500;
+    this.frames = 750;
     this.frame = 0;
 
     this.posX = from.x;
@@ -65,7 +65,7 @@ export default class Ball {
           this.mainContext.stroke();
 
           // Move hit ball
-          this.frames = this.frames / 10;
+          this.frames = this.frames / 5;
           this.frame = 0;
 
           const diffX = this.posX - balls[i].posX;
@@ -77,35 +77,36 @@ export default class Ball {
           };
 
           // Move hitter ball
-          balls[i].frames = balls[i].frames / 10;
+          balls[i].frames = balls[i].frames / 5;
           balls[i].frame = 0;
           balls[i].to = {
-            x: balls[i].posX - 20,
-            y: balls[i].posY + 20,
+            x: balls[i].posX - diffX * 5,
+            y: balls[i].posY + diffY * 5,
           };
         }
       }
     }
   }
 
-  getEase(currentProgress, start, distance, steps) {
-    currentProgress /= steps / 2;
-    if (currentProgress <= 1) {
-      return (distance / 2) * currentProgress * currentProgress + start;
-    }
-    currentProgress--;
-    return (
-      -1 * (distance / 2) * (currentProgress * (currentProgress - 2) - 1) +
-      start
-    );
+  getEase(t, b, c, d) {
+    return -c * (t /= d) * (t - 2) + b;
   }
+
+  // getEase(currentProgress, start, distance, steps, power) {
+  //   currentProgress /= steps / 2;
+  //   if (currentProgress < 1) {
+  //     return (distance / 2) * Math.pow(currentProgress, power) + start;
+  //   }
+  //   currentProgress -= 2;
+  //   return (distance / 2) * (Math.pow(currentProgress, power) + 2) + start;
+  // }
 
   getX() {
     if (!this.to) return this.posX;
     let distance = this.to.x - this.posX;
     let steps = this.frames;
     let currentProgress = this.frame;
-    return this.getEase(currentProgress, this.posX, distance, steps);
+    return this.getEase(currentProgress, this.posX, distance, steps, 5);
   }
 
   getY() {
@@ -113,6 +114,6 @@ export default class Ball {
     let distance = this.to.y - this.posY;
     let steps = this.frames;
     let currentProgress = this.frame;
-    return this.getEase(currentProgress, this.posY, distance, steps);
+    return this.getEase(currentProgress, this.posY, distance, steps, 5);
   }
 }

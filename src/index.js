@@ -10,7 +10,7 @@ class Game {
     this.balls = [];
 
     this.balls.push(
-      new Ball(this.ctx, 1, { x: 100, y: 252 }, { x: 800, y: 200 })
+      new Ball(this.ctx, 1, { x: 100, y: 178 }, { x: 800, y: 200 })
     );
     this.balls.push(new Ball(this.ctx, 2, { x: 400, y: 200 }, null));
 
