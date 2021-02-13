@@ -16,14 +16,4 @@ export default class Canvas {
     this.canvas.height = CANVAS_HEIGHT + CANVAS_PADDING * 2;
     document.body.appendChild(this.canvas);
   }
-
-  drawCanvas() {
-    this.ctx.fillStyle = "rgb(0, 80, 0)";
-    this.ctx.fillRect(
-      CANVAS_PADDING,
-      CANVAS_PADDING,
-      CANVAS_WIDTH,
-      CANVAS_HEIGHT
-    );
-  }
 }
