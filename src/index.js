@@ -1,6 +1,13 @@
 import "./styles.css";
 
-import { CANVAS_HEIGHT, CANVAS_PADDING, CANVAS_WIDTH } from "./settings";
+import {
+  BOARD_COLOR,
+  CANVAS_HEIGHT,
+  CANVAS_PADDING,
+  CANVAS_TOTAL_HEIGHT,
+  CANVAS_TOTAL_WIDTH,
+  CANVAS_WIDTH,
+} from "./settings";
 
 import BallFactory from "./BallFactory";
 import Canvas from "./Canvas";
@@ -12,22 +19,28 @@ class Game {
     this.ctx = this.canvas.ctx;
     this.objects = [];
 
-    this.objects.push(new Cue(this.ctx, this.canvas.getPosition()));
+    this.gameState = "shooting";
+    this.setupObjects();
+    this.gameLoop();
+  }
+
+  setupObjects() {
+    this.cue = new Cue(this.ctx, this.canvas.getPosition());
+    this.objects.push(this.cue);
 
     this.objects.push(BallFactory.CreateBall(this.ctx, "WhiteBall"));
     this.objects.push(BallFactory.CreateBall(this.ctx, "TestBall"));
+  }
 
-    this.drawAndUpdate();
+  handleGame() {
+    if (this.gameState === "shooting") {
+      this.cue.addRotateCueHandler();
+    }
   }
 
   clearAndDrawContext() {
-    this.ctx.clearRect(
-      0,
-      0,
-      CANVAS_WIDTH + CANVAS_PADDING * 2,
-      CANVAS_HEIGHT + CANVAS_PADDING * 2
-    );
-    this.ctx.fillStyle = "rgb(0, 80, 0)";
+    this.ctx.clearRect(0, 0, CANVAS_TOTAL_WIDTH, CANVAS_TOTAL_HEIGHT);
+    this.ctx.fillStyle = BOARD_COLOR;
     this.ctx.fillRect(
       CANVAS_PADDING,
       CANVAS_PADDING,
@@ -36,8 +49,9 @@ class Game {
     );
   }
 
-  drawAndUpdate() {
+  gameLoop() {
     this.clearAndDrawContext();
+    this.handleGame();
 
     for (var i = 0; i < this.objects.length; i++) {
       this.objects[i].update();
@@ -46,7 +60,7 @@ class Game {
       );
     }
 
-    requestAnimationFrame(this.drawAndUpdate.bind(this));
+    requestAnimationFrame(this.gameLoop.bind(this));
   }
 }
 

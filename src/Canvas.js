@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_PADDING, CANVAS_WIDTH } from "./settings";
+import { CANVAS_TOTAL_HEIGHT, CANVAS_TOTAL_WIDTH } from "./settings";
 
 export default class Canvas {
   constructor() {
@@ -12,8 +12,8 @@ export default class Canvas {
   }
 
   addCanvas() {
-    this.canvas.width = CANVAS_WIDTH + CANVAS_PADDING * 2;
-    this.canvas.height = CANVAS_HEIGHT + CANVAS_PADDING * 2;
+    this.canvas.width = CANVAS_TOTAL_WIDTH;
+    this.canvas.height = CANVAS_TOTAL_HEIGHT;
     document.body.appendChild(this.canvas);
   }
 }

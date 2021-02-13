@@ -1,6 +1,9 @@
 export const CANVAS_WIDTH = 900;
 export const CANVAS_HEIGHT = 400;
 export const CANVAS_PADDING = 150;
+export const CANVAS_TOTAL_WIDTH = CANVAS_WIDTH + CANVAS_PADDING * 2;
+export const CANVAS_TOTAL_HEIGHT = CANVAS_HEIGHT + CANVAS_PADDING * 2;
 export const BALL_SIZE = 30;
 export const CUE_WIDTH = 450;
 export const CUE_HEIGHT = 100;
+export const BOARD_COLOR = "rgb(0, 80, 0)";
