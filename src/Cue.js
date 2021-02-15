@@ -1,6 +1,7 @@
 import {
   CANVAS_HEIGHT,
   CANVAS_PADDING,
+  CANVAS_TOTAL_HEIGHT,
   CUE_HEIGHT,
   CUE_WIDTH,
 } from "./settings";
@@ -30,16 +31,34 @@ export default class Cue {
   }
 
   handleRotateCue(e) {
-    // Circle mouse around ball
+    const { clientY } = e;
     this.allowRotating = true;
 
-    if (this.shotFromStart) {
-      if (e.clientY > 265 && e.clientY < 455) {
-        this.rotateAngle = e.clientY;
+    // Calculate angle for cue to circle around ball
+    if (
+      clientY > this.canvasPosition.top + CANVAS_PADDING &&
+      clientY < this.canvasPosition.bottom - CANVAS_PADDING
+    ) {
+      const relativeMouseYPos =
+        clientY - (this.canvasPosition.top + CANVAS_PADDING);
+      const percentage = relativeMouseYPos / CANVAS_HEIGHT;
+      // Calculate angle
+      if (percentage < 0.5) {
+        this.rotateAngle = 270 + percentage * 2 * 90;
+      } else {
+        this.rotateAngle = percentage * 90;
       }
-    } else {
-      this.rotateAngle = e.clientY;
     }
+
+    // if (this.shotFromStart) {
+    //   if (e.clientY > 265 && e.clientY < 455) {
+    //     this.rotateAngle = e.clientY;
+    //   }
+    // } else {
+    //   this.rotateAngle = e.clientY;
+    // }
+
+    // this.rotateAngle = 90;
   }
 
   handleMouseDown() {
@@ -70,7 +89,7 @@ export default class Cue {
   drawRotatingCue() {
     this.mainContext.save();
     this.mainContext.translate(355, 355);
-    this.mainContext.rotate(-this.rotateAngle * (Math.PI / 180));
+    this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
     this.mainContext.drawImage(
       this.image,
       this.posX - 355,
@@ -92,7 +111,11 @@ export default class Cue {
   }
 
   update() {
-    this.allowRotating ? this.drawRotatingCue() : this.drawCue();
+    if (this.allowRotating) {
+      this.drawRotatingCue();
+    } else {
+      this.drawCue();
+    }
 
     if (this.frame < this.frames) {
       this.frame++;

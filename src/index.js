@@ -32,12 +32,6 @@ class Game {
     this.objects.push(BallFactory.CreateBall(this.ctx, "TestBall"));
   }
 
-  handleGame() {
-    if (this.gameState === "shooting") {
-      this.cue.addRotateCueHandler();
-    }
-  }
-
   clearAndDrawContext() {
     this.ctx.clearRect(0, 0, CANVAS_TOTAL_WIDTH, CANVAS_TOTAL_HEIGHT);
     this.ctx.fillStyle = BOARD_COLOR;
@@ -47,6 +41,12 @@ class Game {
       CANVAS_WIDTH,
       CANVAS_HEIGHT
     );
+  }
+
+  handleGame() {
+    if (this.gameState === "shooting") {
+      this.cue.addRotateCueHandler();
+    }
   }
 
   gameLoop() {
