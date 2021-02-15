@@ -14,12 +14,14 @@ export default class Ball {
     this.maxFrames = 25000;
     this.frames = this.maxFrames;
     this.frame = 0;
-    this.speed = 0;
+    this.ease = 0;
+    this.allowGetEase = true;
 
     // Position
     this.posX = from.x;
     this.posY = from.y;
     this.to = to;
+    this.reachedDestination = false;
   }
 
   update(otherBalls, power) {
@@ -47,8 +49,8 @@ export default class Ball {
     const y = this.posY + Math.sin((Math.PI * angle) / 180) * power * 5;
 
     this.to = {
-      x,
-      y,
+      x: parseInt(x),
+      y: parseInt(y),
     };
 
     return { x, y };
@@ -66,29 +68,36 @@ export default class Ball {
       const dy = thisCenterPointY - otherCenterPointY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      this.mainContext.beginPath();
+      // Helper lines
+      /* this.mainContext.beginPath();
       this.mainContext.moveTo(thisCenterPointX, thisCenterPointY);
       this.mainContext.lineTo(otherCenterPointX, otherCenterPointY);
-      this.mainContext.stroke();
+      this.mainContext.stroke(); */
 
       // Collision detected
       if (distance < this.radius / 2 + otherBalls[i].radius / 2) {
-        console.log("collided");
         // Not the whiteball
         if (this.id !== 1) {
-          const diffX = thisCenterPointX - otherCenterPointX;
-          const diffY = otherCenterPointY - thisCenterPointY;
+          // Get easing speed
+          let speed = otherBalls[i].ease * 2;
+          otherBalls[i].allowGetEase = false;
+          this.allowGetEase = false;
+
+          if (speed < 0) speed = speed * -1;
+
+          const diffX = (thisCenterPointX - otherCenterPointX) * speed;
+          const diffY = (otherCenterPointY - thisCenterPointY) * speed;
 
           // Move this ball relative to power
           this.to = {
-            x: this.posX + diffX * (power / 25),
-            y: this.posY - diffY * (power / 25),
+            x: parseInt(this.posX + diffX),
+            y: parseInt(this.posY - diffY),
           };
 
           // Move the other ball half the power
           otherBalls[i].to = {
-            x: otherBalls[i].posX - diffX * (power / 50),
-            y: otherBalls[i].posY + diffY * (power / 50),
+            x: parseInt(otherBalls[i].posX - diffX),
+            y: parseInt(otherBalls[i].posY + diffY),
           };
         }
       }
@@ -101,9 +110,12 @@ export default class Ball {
   }
 
   getEase(currentProgress, position, distance, steps) {
-    return (
-      -distance * (currentProgress /= steps) * (currentProgress - 2) + position
-    );
+    const ease = -distance * (currentProgress /= steps) * (currentProgress - 2);
+    // Save easing for ball effect
+    if (ease !== 0 && this.allowGetEase) {
+      this.ease = ease;
+    }
+    return ease + position;
   }
 
   getX() {
@@ -112,10 +124,12 @@ export default class Ball {
     let steps = this.frames;
     let currentProgress = this.frame;
     // Reset frames
-    if (this.frames !== this.maxFrames)
+    if (this.frames !== this.maxFrames) {
       console.log("Frames are: ", this.frames);
-    if (distance > 0 && distance < 1 && this.frames !== this.maxFrames)
+    }
+    if (distance > 0 && distance < 1 && this.frames !== this.maxFrames) {
       this.resetFrames();
+    }
     return this.getEase(currentProgress, this.posX, distance, steps);
   }
 
@@ -125,8 +139,9 @@ export default class Ball {
     let steps = this.frames;
     let currentProgress = this.frame;
     // Reset frames
-    if (distance > 0 && distance < 1 && this.frames !== this.maxFrames)
+    if (distance > 0 && distance < 1 && this.frames !== this.maxFrames) {
       this.resetFrames();
+    }
     return this.getEase(currentProgress, this.posY, distance, steps);
   }
 }

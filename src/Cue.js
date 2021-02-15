@@ -69,7 +69,7 @@ export default class Cue {
     this.mainContext.restore();
   }
 
-  moveCueToWhiteBall({ x, y }) {
+  moveToWhiteBall({ x, y }) {
     this.ctxPosX = x + BALL_SIZE / 2;
     this.ctxPosY = y + BALL_SIZE / 2;
   }

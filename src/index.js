@@ -54,11 +54,7 @@ class Game {
 
   handleGame() {
     if (this.cue.shot) {
-      const nextPos = this.whiteBall.moveTo(
-        this.cue.rotateAngle,
-        this.cue.power
-      );
-      this.cue.moveCueToWhiteBall(nextPos);
+      this.whiteBall.moveTo(this.cue.rotateAngle, this.cue.power);
     }
   }
 
@@ -68,11 +64,20 @@ class Game {
 
     this.cue.update();
 
+    // Set cue at whiteball after finishing rolling
+    if (this.whiteBall.reachedDestination) {
+      this.cue.moveToWhiteBall({
+        x: this.whiteBall.posX,
+        y: this.whiteBall.posY,
+      });
+    }
+
     for (var i = 0; i < this.balls.length; i++) {
       const otherBalls = this.balls.filter(
         (ball) => ball.id !== this.balls[i].id
       );
 
+      this.balls[i].allowGetEase = true;
       this.balls[i].update(otherBalls, this.cue.power);
     }
 
