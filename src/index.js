@@ -17,19 +17,25 @@ class Game {
   constructor() {
     this.canvas = new Canvas();
     this.ctx = this.canvas.ctx;
-    this.objects = [];
+    this.balls = [];
 
-    this.gameState = "shooting";
-    this.setupObjects();
+    this.setupGame();
     this.gameLoop();
+  }
+
+  setupGame() {
+    this.setupObjects();
+    this.cue.addRotateCueHandler();
+    this.cue.addMouseDownHandler();
   }
 
   setupObjects() {
     this.cue = new Cue(this.ctx, this.canvas.getPosition());
-    this.objects.push(this.cue);
 
-    this.objects.push(BallFactory.CreateBall(this.ctx, "WhiteBall"));
-    this.objects.push(BallFactory.CreateBall(this.ctx, "TestBall"));
+    this.balls.push(BallFactory.CreateBall(this.ctx, "WhiteBall"));
+    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall"));
+
+    this.whiteBall = this.balls.filter((ball) => ball.id === 1)[0];
   }
 
   clearAndDrawContext() {
@@ -44,9 +50,12 @@ class Game {
   }
 
   handleGame() {
-    if (this.gameState === "shooting") {
-      this.cue.addRotateCueHandler();
-      this.cue.addMouseDownHandler();
+    if (this.cue.shot) {
+      const nextPos = this.whiteBall.moveTo(
+        this.cue.rotateAngle,
+        this.cue.power
+      );
+      this.cue.moveCueToWhiteBall(nextPos);
     }
   }
 
@@ -54,11 +63,14 @@ class Game {
     this.clearAndDrawContext();
     this.handleGame();
 
-    for (var i = 0; i < this.objects.length; i++) {
-      this.objects[i].update();
-      this.objects[i].detectCollision(
-        this.objects.filter((ball) => ball !== this.objects[i])
+    this.cue.update();
+
+    for (var i = 0; i < this.balls.length; i++) {
+      const otherBalls = this.balls.filter(
+        (ball) => ball.id !== this.balls[i].id
       );
+
+      this.balls[i].update(otherBalls, this.cue.power);
     }
 
     requestAnimationFrame(this.gameLoop.bind(this));

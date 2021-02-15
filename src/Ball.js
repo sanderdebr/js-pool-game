@@ -13,16 +13,19 @@ export default class Ball {
     // Speed
     this.frames = 750;
     this.frame = 0;
+    this.speed = 0;
 
+    // Position
     this.posX = from.x;
     this.posY = from.y;
-
     this.to = to;
   }
 
-  update() {
+  update(otherBalls, power) {
     this.posX = this.getX();
     this.posY = this.getY();
+
+    this.detectCollision(otherBalls, power);
 
     this.mainContext.drawImage(
       this.image,
@@ -37,52 +40,49 @@ export default class Ball {
     }
   }
 
-  detectCollision(balls) {
-    for (let i = 0; i < balls.length; i++) {
-      const dx = this.posX - balls[i].posX;
-      const dy = this.posY - balls[i].posY;
+  moveTo(angle, power) {
+    const x = this.posX + Math.cos((Math.PI * angle) / 180) * power * 5;
+    const y = this.posY + Math.sin((Math.PI * angle) / 180) * power * 5;
+
+    this.to = {
+      x,
+      y,
+    };
+
+    return { x, y };
+  }
+
+  detectCollision(otherBalls, power) {
+    for (let i = 0; i < otherBalls.length; i++) {
+      // Calculate distance between two center points
+      const thisCenterPointX = this.posX + this.radius / 2;
+      const thisCenterPointY = this.posY + this.radius / 2;
+      const otherCenterPointX = otherBalls[i].posX + otherBalls[i].radius / 2;
+      const otherCenterPointY = otherBalls[i].posY + otherBalls[i].radius / 2;
+
+      const dx = thisCenterPointX - otherCenterPointX;
+      const dy = thisCenterPointY - otherCenterPointY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
+      this.mainContext.beginPath();
+      this.mainContext.moveTo(thisCenterPointX, thisCenterPointY);
+      this.mainContext.lineTo(otherCenterPointX, otherCenterPointY);
+      this.mainContext.stroke();
+
       // Collision detected
-      if (distance < this.radius / 2 + balls[i].radius / 2) {
-        // Find angle of collision
-        const angle =
-          (Math.atan2(this.posY - balls[i].posY, this.posX - balls[i].posX) *
-            180) /
-          Math.PI;
+      if (distance < this.radius / 2 + otherBalls[i].radius / 2) {
+        // Not the whiteball
+        if (this.id !== 1) {
+          const diffX = thisCenterPointX - otherCenterPointX;
+          const diffY = otherCenterPointY - thisCenterPointY;
 
-        // Other ball was not moving
-        if (!this.to) {
-          // Draw line
-          this.mainContext.beginPath();
-          this.mainContext.moveTo(
-            this.posX + this.radius / 2,
-            this.posY + this.radius / 2
-          );
-          this.mainContext.lineTo(
-            balls[i].posX + this.radius / 2,
-            balls[i].posY + this.radius / 2
-          );
-          this.mainContext.stroke();
+          const speed = power / 10;
 
-          // Move hit ball
-          this.frames = this.frames / 5;
-          this.frame = 0;
-
-          const diffX = this.posX - balls[i].posX;
-          const diffY = balls[i].posY - this.posY;
+          console.log("collision", diffX, diffY, speed);
 
           this.to = {
-            x: this.posX + diffX * 5,
-            y: this.posY - diffY * 5,
-          };
-
-          // Move hitter ball
-          balls[i].frames = balls[i].frames / 5;
-          balls[i].frame = 0;
-          balls[i].to = {
-            x: balls[i].posX - diffX * 5,
-            y: balls[i].posY + diffY * 5,
+            x: this.posX + diffX * speed,
+            y: this.posY - diffY * speed,
           };
         }
       }

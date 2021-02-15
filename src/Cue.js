@@ -16,29 +16,35 @@ export default class Cue {
     this.image = new Image();
     this.image.src = CueImage;
 
-    this.shotFromStart = true;
+    this.shotFromStart = false;
 
     // Shooting
     this.mouseDown = false;
+    this.power = 0;
+    this.shot = false;
 
     // Rotation
-    this.allowRotating = false;
     this.rotateAngle = 0;
 
-    // Position
-    this.posX = -100;
-    this.posY = CANVAS_HEIGHT / 2 + CANVAS_PADDING - 50;
+    // Starting position of cue context
+    this.ctxPosX = 355;
+    this.ctxPosY = CANVAS_TOTAL_HEIGHT / 2;
+
+    // Starting position of cue image
+    this.posX = -CUE_WIDTH;
+    this.posY = -CUE_HEIGHT / 2;
   }
 
   handleRotateCue(e) {
     const { clientY } = e;
-    this.allowRotating = true;
+
+    // Only half circle when shot from start
+    const isHalfCircle =
+      clientY > this.canvasPosition.top + CANVAS_PADDING &&
+      clientY < this.canvasPosition.bottom - CANVAS_PADDING;
 
     // Calculate angle for cue to circle around ball
-    if (
-      clientY > this.canvasPosition.top + CANVAS_PADDING &&
-      clientY < this.canvasPosition.bottom - CANVAS_PADDING
-    ) {
+    if (this.shotFromStart && isHalfCircle) {
       const relativeMouseYPos =
         clientY - (this.canvasPosition.top + CANVAS_PADDING);
       const percentage = relativeMouseYPos / CANVAS_HEIGHT;
@@ -48,26 +54,70 @@ export default class Cue {
       } else {
         this.rotateAngle = (percentage - 0.5) * 2 * 90;
       }
+    } else {
+      this.rotateAngle = clientY;
     }
   }
 
   increasePower() {
-    this.posX++;
-    this.posY++;
+    this.mainContext.save();
+    this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
 
+    this.posX--;
+    this.power++;
+
+    this.mainContext.restore();
+  }
+
+  moveCueToWhiteBall({ x, y }) {
+    this.ctxPosX = x + BALL_SIZE / 2;
+    this.ctxPosY = y + BALL_SIZE / 2;
+  }
+
+  drawRotatingCue() {
+    this.mainContext.save();
+    // Move context to main ball position
+    this.mainContext.translate(this.ctxPosX, this.ctxPosY);
+    this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
+    this.mainContext.drawImage(
+      this.image,
+      this.posX,
+      this.posY,
+      CUE_WIDTH,
+      CUE_HEIGHT
+    );
     this.mainContext.beginPath();
-    this.mainContext.moveTo(0, this.rotateAngle);
-    this.mainContext.lineTo(345 + BALL_SIZE / 2, CANVAS_TOTAL_HEIGHT / 2);
+    this.mainContext.rect(this.posX, this.posY, 100, 100);
     this.mainContext.stroke();
+    this.mainContext.restore();
+  }
+
+  update() {
+    this.drawRotatingCue();
+
+    if (this.mouseDown) {
+      this.increasePower();
+    }
+
+    // Only shoot once, reset power
+    if (this.shot) {
+      this.shot = false;
+    }
+
+    if (this.frame < this.frames) {
+      this.frame++;
+    }
   }
 
   handleMouseDown() {
     this.latestPos = { x: this.posX, y: this.posY };
     this.mouseDown = true;
+    this.power = 0;
   }
 
   handleMouseUp() {
     this.mouseDown = false;
+    this.shot = true;
     this.posX = this.latestPos.x;
     this.posY = this.latestPos.y;
   }
@@ -78,50 +128,11 @@ export default class Cue {
   }
 
   addRotateCueHandler() {
-    document.addEventListener("mousemove", this.handleRotateCue.bind(this));
+    this.handleRotateCueBinding = this.handleRotateCue.bind(this);
+    document.addEventListener("mousemove", this.handleRotateCueBinding);
   }
 
-  drawRotatingCue() {
-    this.mainContext.save();
-    this.mainContext.translate(355, 355);
-    this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
-    this.mainContext.drawImage(
-      this.image,
-      this.posX - 355,
-      this.posY - 355,
-      CUE_WIDTH,
-      CUE_HEIGHT
-    );
-    this.mainContext.restore();
-  }
-
-  drawCue() {
-    this.mainContext.drawImage(
-      this.image,
-      this.posX,
-      this.posY,
-      CUE_WIDTH,
-      CUE_HEIGHT
-    );
-  }
-
-  update() {
-    if (this.allowRotating) {
-      this.drawRotatingCue();
-    } else {
-      this.drawCue();
-    }
-
-    if (this.mouseDown) {
-      this.increasePower();
-    }
-
-    if (this.frame < this.frames) {
-      this.frame++;
-    }
-  }
-
-  detectCollision() {
-    return null;
+  removeRotateCueHandler() {
+    document.removeEventListener("mousemove", this.handleRotateCueBinding);
   }
 }
