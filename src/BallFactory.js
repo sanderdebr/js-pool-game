@@ -19,7 +19,19 @@ export default class BallFactory {
     }
 
     if (type == "TestBall") {
-      return new Ball(ctx, 2, { ...whiteBallStartPos, x: 800 }, null);
+      return new Ball(ctx, 2, { x: 800, y: 340 }, null);
+    }
+
+    if (type == "TestBall2") {
+      return new Ball(ctx, 3, { x: 900, y: 350 }, null);
+    }
+
+    if (type == "TestBall3") {
+      return new Ball(ctx, 3, { x: 850, y: 320 }, null);
+    }
+
+    if (type == "TestBall4") {
+      return new Ball(ctx, 3, { x: 880, y: 370 }, null);
     }
   }
 }

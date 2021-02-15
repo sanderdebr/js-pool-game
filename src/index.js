@@ -34,6 +34,9 @@ class Game {
 
     this.balls.push(BallFactory.CreateBall(this.ctx, "WhiteBall"));
     this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall"));
+    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall2"));
+    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall3"));
+    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall4"));
 
     this.whiteBall = this.balls.filter((ball) => ball.id === 1)[0];
   }
