@@ -1,4 +1,5 @@
 import {
+  BALL_SIZE,
   CANVAS_HEIGHT,
   CANVAS_PADDING,
   CANVAS_TOTAL_HEIGHT,
@@ -18,7 +19,7 @@ export default class Cue {
     this.shotFromStart = true;
 
     // Shooting
-    this.power = 0;
+    this.mouseDown = false;
 
     // Rotation
     this.allowRotating = false;
@@ -27,7 +28,6 @@ export default class Cue {
     // Position
     this.posX = -100;
     this.posY = CANVAS_HEIGHT / 2 + CANVAS_PADDING - 50;
-    this.latestPos = null;
   }
 
   handleRotateCue(e) {
@@ -46,44 +46,39 @@ export default class Cue {
       if (percentage < 0.5) {
         this.rotateAngle = 270 + percentage * 2 * 90;
       } else {
-        this.rotateAngle = percentage * 90;
+        this.rotateAngle = (percentage - 0.5) * 2 * 90;
       }
     }
+  }
 
-    // if (this.shotFromStart) {
-    //   if (e.clientY > 265 && e.clientY < 455) {
-    //     this.rotateAngle = e.clientY;
-    //   }
-    // } else {
-    //   this.rotateAngle = e.clientY;
-    // }
+  increasePower() {
+    this.posX++;
+    this.posY++;
 
-    // this.rotateAngle = 90;
+    this.mainContext.beginPath();
+    this.mainContext.moveTo(0, this.rotateAngle);
+    this.mainContext.lineTo(345 + BALL_SIZE / 2, CANVAS_TOTAL_HEIGHT / 2);
+    this.mainContext.stroke();
   }
 
   handleMouseDown() {
-    if (!this.latestPos) {
-      this.latestPos = { x: this.posX, y: this.posY };
-    }
-    this.posX++;
-    this.posY++;
-    this.power++;
+    this.latestPos = { x: this.posX, y: this.posY };
+    this.mouseDown = true;
   }
 
   handleMouseUp() {
-    if (!this.latestPos) {
-      this.latestPos = { x: this.posX, y: this.posY };
-    }
+    this.mouseDown = false;
     this.posX = this.latestPos.x;
     this.posY = this.latestPos.y;
-    this.latestPos = null;
-    this.power = 0;
+  }
+
+  addMouseDownHandler() {
+    document.addEventListener("mousedown", this.handleMouseDown.bind(this));
+    document.addEventListener("mouseup", this.handleMouseUp.bind(this));
   }
 
   addRotateCueHandler() {
     document.addEventListener("mousemove", this.handleRotateCue.bind(this));
-    document.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    document.addEventListener("mouseup", this.handleMouseUp.bind(this));
   }
 
   drawRotatingCue() {
@@ -115,6 +110,10 @@ export default class Cue {
       this.drawRotatingCue();
     } else {
       this.drawCue();
+    }
+
+    if (this.mouseDown) {
+      this.increasePower();
     }
 
     if (this.frame < this.frames) {

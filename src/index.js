@@ -46,6 +46,7 @@ class Game {
   handleGame() {
     if (this.gameState === "shooting") {
       this.cue.addRotateCueHandler();
+      this.cue.addMouseDownHandler();
     }
   }
 
