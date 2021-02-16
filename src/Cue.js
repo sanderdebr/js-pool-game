@@ -64,7 +64,7 @@ export default class Cue {
     this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
 
     this.posX--;
-    this.power++;
+    this.power += 10;
 
     this.mainContext.restore();
   }
@@ -86,9 +86,11 @@ export default class Cue {
       CUE_WIDTH,
       CUE_HEIGHT
     );
-    this.mainContext.beginPath();
-    this.mainContext.rect(this.posX, this.posY, 100, 100);
-    this.mainContext.stroke();
+
+    // Helper box for main context
+    // this.mainContext.beginPath();
+    // this.mainContext.rect(this.posX, this.posY, 100, 100);
+    // this.mainContext.stroke();
     this.mainContext.restore();
   }
 
