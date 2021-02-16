@@ -2,20 +2,24 @@ import {
   BALL_SIZE,
   CANVAS_HEIGHT,
   CANVAS_PADDING,
-  CANVAS_TOTAL_WIDTH,
   CANVAS_WIDTH,
 } from "./settings";
 
-import WhiteBallImage from "./assets/images/ball_white.png";
-
 export default class Ball {
-  constructor(mainContext, id, from, to) {
+  constructor(mainContext, holes, id, from, to) {
+    this.state = "idle";
     this.mainContext = mainContext;
+    this.holes = holes;
     this.id = id;
     this.radius = BALL_SIZE / 2;
 
     this.image = new Image();
-    this.image.src = WhiteBallImage;
+
+    // Dynamic import of images
+    import(`./assets/images/${id}.png`).then((src) => {
+      this.state = "ready";
+      this.image.src = src.default;
+    });
 
     // Speed
     this.maxFrames = 100000;
@@ -28,6 +32,7 @@ export default class Ball {
     this.posY = from.y;
     this.to = to;
     this.angle = null;
+    this.pocketed = false;
   }
 
   update() {
@@ -41,6 +46,7 @@ export default class Ball {
 
     this.getCurrentAngle();
     this.keepOnTable();
+    this.detectHole();
 
     this.mainContext.drawImage(
       this.image,
@@ -104,6 +110,26 @@ export default class Ball {
     }
   }
 
+  detectHole() {
+    for (let i = 0; i < this.holes.length; i++) {
+      const hole = this.holes[i];
+      const radiusCombined = this.radius + 12.5;
+      // Calculate distance between two center points
+      const thisCenterPointX = this.posX + this.radius;
+      const thisCenterPointY = this.posY + this.radius;
+
+      const dx = thisCenterPointX - hole.x;
+      const dy = thisCenterPointY - hole.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Hole has been touched
+      if (distance < radiusCombined) {
+        console.log(`Hit hole ${hole.id}`);
+        this.pocketed = true;
+      }
+    }
+  }
+
   detectCollision(balls) {
     for (let i = 0; i < balls.length; i++) {
       // Calculate distance and angle between two balls centerpoints
@@ -111,15 +137,12 @@ export default class Ball {
       if (otherBall.id === this.id) return;
 
       const radiusCombined = this.radius + otherBall.radius;
-      const { distance, dx, dy, angle } = this.getDeltaCenterpoints(
-        this,
-        otherBall
-      );
+      const { distance, angle } = this.getDeltaCenterpoints(this, otherBall);
 
       // Collision detected
       if (distance < radiusCombined) {
         // Not the whiteball
-        if (this.id !== 1) {
+        if (this.id !== 0) {
           console.log("detected", this.id);
           // Take largest speed
           let speed =
@@ -133,16 +156,6 @@ export default class Ball {
 
           this.moveTo(newAngle, speed * 0.75);
           otherBall.moveTo(angle, speed * 0.5);
-          // // Move both balls
-          // this.to = {
-          //   x: this.posX + dx + speed,
-          //   y: this.posY - dy - speed,
-          // };
-
-          // otherBall.to = {
-          //   x: otherBall.posX - dx - speed,
-          //   y: otherBall.posY + dy + speed,
-          // };
         }
       }
     }
@@ -174,7 +187,7 @@ export default class Ball {
     // this.mainContext.lineTo(ball2CenterPointX, ball2CenterPointY);
     // this.mainContext.stroke();
 
-    return { distance, dx, dy, angle };
+    return { distance, angle };
   }
 
   resetFrames(frames = 50000) {

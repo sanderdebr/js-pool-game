@@ -14,6 +14,7 @@ export default class Cue {
     this.mainContext = mainContext;
     this.canvasPosition = canvasPosition;
     this.image = new Image();
+    this.image.onLoad = null; //TODO
     this.image.src = CueImage;
 
     this.shotFromStart = false;
@@ -21,6 +22,7 @@ export default class Cue {
     // Shooting
     this.mouseDown = false;
     this.power = 0;
+    this.maxPower = 5000;
     this.shot = false;
 
     // Rotation
@@ -60,13 +62,15 @@ export default class Cue {
   }
 
   increasePower() {
-    this.mainContext.save();
-    this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
+    if (this.power < this.maxPower) {
+      this.mainContext.save();
+      this.mainContext.rotate(this.rotateAngle * (Math.PI / 180));
 
-    this.posX--;
-    this.power += 10;
+      this.posX--;
+      this.power += 25;
 
-    this.mainContext.restore();
+      this.mainContext.restore();
+    }
   }
 
   moveToWhiteBall({ x, y }) {

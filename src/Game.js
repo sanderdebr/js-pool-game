@@ -1,14 +1,5 @@
 import "./styles.css";
 
-import {
-  BOARD_COLOR,
-  CANVAS_HEIGHT,
-  CANVAS_PADDING,
-  CANVAS_TOTAL_HEIGHT,
-  CANVAS_TOTAL_WIDTH,
-  CANVAS_WIDTH,
-} from "./settings";
-
 import BallFactory from "./BallFactory";
 import Canvas from "./Canvas";
 import Cue from "./Cue";
@@ -18,9 +9,10 @@ export default class Game {
     this.canvas = new Canvas();
     this.ctx = this.canvas.ctx;
     this.balls = [];
+    this.ballFactory = new BallFactory(this.ctx, this.canvas.holes);
 
     this.setupGame();
-    this.gameLoop();
+    this.loadLoop();
   }
 
   setupGame() {
@@ -32,24 +24,9 @@ export default class Game {
   setupObjects() {
     this.cue = new Cue(this.ctx, this.canvas.getPosition());
 
-    this.balls.push(BallFactory.CreateBall(this.ctx, "WhiteBall"));
-    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall1"));
-    this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall2"));
-    // this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall3"));
-    // this.balls.push(BallFactory.CreateBall(this.ctx, "TestBall4"));
+    this.balls = this.ballFactory.createBalls();
 
-    this.whiteBall = this.balls.filter((ball) => ball.id === 1)[0];
-  }
-
-  clearAndDrawContext() {
-    this.ctx.clearRect(0, 0, CANVAS_TOTAL_WIDTH, CANVAS_TOTAL_HEIGHT);
-    this.ctx.fillStyle = BOARD_COLOR;
-    this.ctx.fillRect(
-      CANVAS_PADDING,
-      CANVAS_PADDING,
-      CANVAS_WIDTH,
-      CANVAS_HEIGHT
-    );
+    this.whiteBall = this.balls.filter((ball) => ball.id === 0)[0];
   }
 
   handleGame() {
@@ -58,8 +35,27 @@ export default class Game {
     }
   }
 
+  showLoadingScreen() {
+    this.ctx.font = "30px Arial";
+    this.ctx.fillText("Loading...", 10, 50);
+  }
+
+  loadLoop() {
+    this.showLoadingScreen();
+
+    const checkIfReady = setInterval(() => {
+      const isReady = (ball) => ball.state === "ready";
+      if (this.canvas.state === "ready" && this.balls.every(isReady)) {
+        console.log("Game is ready");
+        clearInterval(checkIfReady);
+        this.gameLoop();
+      }
+    }, 1000);
+  }
+
   gameLoop() {
-    this.clearAndDrawContext();
+    this.canvas.clearAndDrawContext();
+    this.canvas.showGameInfo();
     this.handleGame();
 
     this.cue.update();
@@ -71,9 +67,11 @@ export default class Game {
     });
 
     for (var i = 0; i < this.balls.length; i++) {
-      this.balls[i].allowGetEase = true;
-      this.balls[i].update(this.balls);
-      this.balls[i].detectCollision(this.balls);
+      const ball = this.balls[i];
+      if (!ball.pocketed) {
+        ball.update(this.balls);
+        ball.detectCollision(this.balls);
+      }
     }
 
     requestAnimationFrame(this.gameLoop.bind(this));
