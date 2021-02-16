@@ -18,7 +18,7 @@ export default class Ball {
     this.image.src = WhiteBallImage;
 
     // Speed
-    this.maxFrames = 50000;
+    this.maxFrames = 100000;
     this.frames = this.maxFrames;
     this.frame = 0;
     this.speed = 0;
@@ -96,10 +96,10 @@ export default class Ball {
     const touchBottom =
       this.posY + this.radius * 2 >= CANVAS_HEIGHT + CANVAS_PADDING;
 
+    let newAngle = this.angle - 90;
+    if (newAngle < 0) newAngle += 360;
+
     if (touchLeft || touchRight || touchBottom || touchTop) {
-      // Touched an edge
-      let newAngle = this.angle - 90;
-      if (newAngle < 0) newAngle += 360;
       this.moveTo(newAngle, this.speed * 0.5);
     }
   }
@@ -131,8 +131,8 @@ export default class Ball {
           if (speed < 0.001) speed = 0;
           if (speed > 300) speed = 300;
 
-          this.moveTo(newAngle, speed * 0.25);
-          otherBall.moveTo(angle, speed * 0.1);
+          this.moveTo(newAngle, speed * 0.75);
+          otherBall.moveTo(angle, speed * 0.5);
           // // Move both balls
           // this.to = {
           //   x: this.posX + dx + speed,
