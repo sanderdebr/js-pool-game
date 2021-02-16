@@ -33,12 +33,6 @@ export default class Canvas {
     this.drawHoles();
   }
 
-  showGameInfo() {
-    this.ctx.font = "18px Arial";
-    this.ctx.fillText("Player 1: ", CANVAS_PADDING - this.edgeSize, 50);
-    this.ctx.fillText("Player 2: ", CANVAS_PADDING - this.edgeSize, 75);
-  }
-
   clearCanvas() {
     this.ctx.clearRect(0, 0, CANVAS_TOTAL_WIDTH, CANVAS_TOTAL_HEIGHT);
   }

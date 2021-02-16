@@ -6,10 +6,11 @@ import {
 } from "./settings";
 
 export default class Ball {
-  constructor(mainContext, holes, id, from, to) {
+  constructor(mainContext, holes, wholeOrHalf, id, from, to) {
     this.state = "idle";
     this.mainContext = mainContext;
     this.holes = holes;
+    this.wholeOrHalf = wholeOrHalf;
     this.id = id;
     this.radius = BALL_SIZE / 2;
 
@@ -67,7 +68,7 @@ export default class Ball {
     if (deltaX < 0) deltaX *= -1;
     if (deltaY < 0) deltaY *= -1;
     this.speed = (deltaX + deltaY) * 100;
-    if (this.speed < 0.001) this.speed = 0;
+    if (this.speed < 0.1) this.speed = 0;
     if (this.speed > 300) this.speed = 300;
   }
 
@@ -151,7 +152,7 @@ export default class Ball {
           let newAngle = angle - 180;
           if (newAngle < 0) newAngle += 360;
 
-          if (speed < 0.001) speed = 0;
+          if (speed < 0.1) speed = 0;
           if (speed > 300) speed = 300;
 
           this.moveTo(newAngle, speed * 0.75);

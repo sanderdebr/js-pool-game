@@ -16,14 +16,14 @@ export default class Cue {
     this.image = new Image();
     this.image.onLoad = null; //TODO
     this.image.src = CueImage;
-
-    this.shotFromStart = false;
+    this.show = true;
 
     // Shooting
     this.mouseDown = false;
     this.power = 0;
     this.maxPower = 5000;
     this.shot = false;
+    this.shotFromStart = false;
 
     // Rotation
     this.rotateAngle = 0;
@@ -98,16 +98,21 @@ export default class Cue {
     this.mainContext.restore();
   }
 
+  handleShot() {
+    this.shot = true;
+    this.show = false;
+    this.removeListeners();
+  }
+
   update() {
-    this.drawRotatingCue();
+    if (this.show) {
+      this.drawRotatingCue();
+    }
+
+    this.shot = false;
 
     if (this.mouseDown) {
       this.increasePower();
-    }
-
-    // Only shoot once, reset power
-    if (this.shot) {
-      this.shot = false;
     }
 
     if (this.frame < this.frames) {
@@ -123,14 +128,16 @@ export default class Cue {
 
   handleMouseUp() {
     this.mouseDown = false;
-    this.shot = true;
+    this.handleShot();
     this.posX = this.latestPos.x;
     this.posY = this.latestPos.y;
   }
 
   addMouseDownHandler() {
-    document.addEventListener("mousedown", this.handleMouseDown.bind(this));
-    document.addEventListener("mouseup", this.handleMouseUp.bind(this));
+    this.handleMouseDownBinding = this.handleMouseDown.bind(this);
+    this.handleMouseUpBinding = this.handleMouseUp.bind(this);
+    document.addEventListener("mousedown", this.handleMouseDownBinding);
+    document.addEventListener("mouseup", this.handleMouseUpBinding);
   }
 
   addRotateCueHandler() {
@@ -138,7 +145,9 @@ export default class Cue {
     document.addEventListener("mousemove", this.handleRotateCueBinding);
   }
 
-  removeRotateCueHandler() {
+  removeListeners() {
+    document.removeEventListener("mousedown", this.handleMouseDownBinding);
+    document.removeEventListener("mouseup", this.handleMouseUpBinding);
     document.removeEventListener("mousemove", this.handleRotateCueBinding);
   }
 }

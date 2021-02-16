@@ -3,6 +3,7 @@ import "./styles.css";
 import BallFactory from "./BallFactory";
 import Canvas from "./Canvas";
 import Cue from "./Cue";
+import GameInfo from "./GameInfo";
 
 export default class Game {
   constructor() {
@@ -10,6 +11,7 @@ export default class Game {
     this.ctx = this.canvas.ctx;
     this.balls = [];
     this.ballFactory = new BallFactory(this.ctx, this.canvas.holes);
+    this.gameInfo = new GameInfo(this.ctx);
 
     this.setupGame();
     this.loadLoop();
@@ -30,6 +32,18 @@ export default class Game {
   }
 
   handleGame() {
+    // Wait for all balls to be still before moving the cue
+    if (!this.cue.show) {
+      setTimeout(() => {
+        const noBallsRolling = this.balls.every((ball) => ball.speed < 10);
+        if (noBallsRolling) {
+          this.cue.show = true;
+          this.cue.addRotateCueHandler();
+          this.cue.addMouseDownHandler();
+        }
+      });
+    }
+
     if (this.cue.shot) {
       this.whiteBall.moveTo(this.cue.rotateAngle, this.cue.power);
     }
@@ -55,10 +69,10 @@ export default class Game {
 
   gameLoop() {
     this.canvas.clearAndDrawContext();
-    this.canvas.showGameInfo();
     this.handleGame();
-
     this.cue.update();
+
+    this.gameInfo.update();
 
     // Set cue at whiteball after finishing rolling
     this.cue.moveToWhiteBall({
@@ -68,7 +82,11 @@ export default class Game {
 
     for (var i = 0; i < this.balls.length; i++) {
       const ball = this.balls[i];
-      if (!ball.pocketed) {
+
+      if (ball.pocketed) {
+        this.gameInfo.handlePocketedBall(ball);
+        this.balls = this.balls.filter((x) => x !== ball);
+      } else {
         ball.update(this.balls);
         ball.detectCollision(this.balls);
       }

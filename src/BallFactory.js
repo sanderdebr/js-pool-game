@@ -27,35 +27,37 @@ export default class BallFactory {
       x: 345,
       y: CANVAS_TOTAL_HEIGHT / 2 - BALL_SIZE / 2,
     };
-    this.balls.push(new Ball(this.ctx, this.holes, 0, whiteBallStartPos));
+    this.balls.push(
+      new Ball(this.ctx, this.holes, "whole", 0, whiteBallStartPos)
+    );
   }
 
   createRowOfFive() {
     let xLine = CANVAS_TOTAL_WIDTH - this.setupDistance;
 
     this.balls.push(
-      new Ball(this.ctx, this.holes, 5, {
+      new Ball(this.ctx, this.holes, "whole", 5, {
         x: xLine,
         y: this.centerY - BALL_SIZE * 2 - this.spaceBetweenBalls * 2,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 4, {
+      new Ball(this.ctx, this.holes, "whole", 4, {
         x: xLine,
         y: this.centerY - BALL_SIZE - this.spaceBetweenBalls,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 13, { x: xLine, y: this.centerY })
+      new Ball(this.ctx, this.holes, "half", 13, { x: xLine, y: this.centerY })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 2, {
+      new Ball(this.ctx, this.holes, "whole", 2, {
         x: xLine,
         y: this.centerY + BALL_SIZE + this.spaceBetweenBalls,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 11, {
+      new Ball(this.ctx, this.holes, "half", 11, {
         x: xLine,
         y: this.centerY + BALL_SIZE * 2 + this.spaceBetweenBalls * 2,
       })
@@ -70,26 +72,26 @@ export default class BallFactory {
       this.spaceBetweenBalls;
 
     this.balls.push(
-      new Ball(this.ctx, this.holes, 14, {
+      new Ball(this.ctx, this.holes, "half", 14, {
         x: xLine,
         y:
           this.centerY - BALL_SIZE / 2 - this.spaceBetweenBalls * 2 - BALL_SIZE,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 3, {
+      new Ball(this.ctx, this.holes, "whole", 3, {
         x: xLine,
         y: this.centerY - BALL_SIZE / 2 - this.spaceBetweenBalls,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 10, {
+      new Ball(this.ctx, this.holes, "half", 10, {
         x: xLine,
         y: this.centerY + BALL_SIZE / 2,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 6, {
+      new Ball(this.ctx, this.holes, "whole", 6, {
         x: xLine,
         y: this.centerY + BALL_SIZE / 2 + this.spaceBetweenBalls + BALL_SIZE,
       })
@@ -104,19 +106,19 @@ export default class BallFactory {
       this.spaceBetweenBalls * 2;
 
     this.balls.push(
-      new Ball(this.ctx, this.holes, 1, {
+      new Ball(this.ctx, this.holes, "whole", 1, {
         x: xLine,
         y: this.centerY - BALL_SIZE - this.spaceBetweenBalls * 2,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 8, {
+      new Ball(this.ctx, this.holes, "whole", 8, {
         x: xLine,
         y: this.centerY - BALL_SIZE / 2 + this.spaceBetweenBalls * 2,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 15, {
+      new Ball(this.ctx, this.holes, "half", 15, {
         x: xLine,
         y: this.centerY + BALL_SIZE,
       })
@@ -131,13 +133,13 @@ export default class BallFactory {
       this.spaceBetweenBalls * 3;
 
     this.balls.push(
-      new Ball(this.ctx, this.holes, 7, {
+      new Ball(this.ctx, this.holes, "whole", 7, {
         x: xLine,
         y: this.centerY - BALL_SIZE / 2 - this.spaceBetweenBalls,
       })
     );
     this.balls.push(
-      new Ball(this.ctx, this.holes, 12, {
+      new Ball(this.ctx, this.holes, "half", 12, {
         x: xLine,
         y: this.centerY + BALL_SIZE / 2,
       })
@@ -152,7 +154,7 @@ export default class BallFactory {
       this.spaceBetweenBalls * 4;
 
     this.balls.push(
-      new Ball(this.ctx, this.holes, 9, {
+      new Ball(this.ctx, this.holes, "half", 9, {
         x: xLine,
         y: this.centerY - BALL_SIZE / 2 + this.spaceBetweenBalls * 2,
       })
